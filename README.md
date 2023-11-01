@@ -12,7 +12,7 @@ _To encourage friendly competition, WordSearch features a leaderboard that displ
 
 _Overall, WordSearch provides a fun and engaging puzzle experience while also allowing players to earn tokens and NFTs with real value. The staking feature encourages players to hold onto their tokens and potentially earn even more, while the leaderboard adds an element of competition to the game. The ability to swap tokens with other players also makes WordSearch a more social game, enabling players to trade tokens and build a community._
 ## How i built it
-Smart contract was written for staking fee and rewards, while chainlink VRFD20.sol contract was used for random words for unique gamplay and guesses with secure random words. the ui was built with next-js 13 for smooth routing and speed. **check out link** [link](https://word-search.vercel.app/) and **Github link** [link](https://github.com/Immanuelolivia1/word_Search).
+Smart contract was written for staking fee and rewards, while chainlink VRFD20.sol contract was used for random words for unique gamplay and guesses with secure random words. the ui was built with next-js 13 for smooth routing and speed. **check out link** [link](https://word-search-ten.vercel.app/) and **Github link** [link](https://github.com/Immanuelolivia1/word_Search).
 <!-- 
 STAKING TOKEN HAS BEEN DEPLOYED TO ________ 0xfbF1E570d7d8AE46fBD2da9cb66427Db55638771
 STAKING CONTRACT HAS BEEN DEPLOYED TO ________ 0xd5148FA685322D8105c927Eb6940A2b4aDec6D79
