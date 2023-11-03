@@ -38,7 +38,7 @@ contract GameContract is EncryptionContract {
     }
 
     //mapping that stores winners
-    address[] private winners;
+    mapping(address => bool) public isWinner;
     //mapping that stores users encryptedword
     mapping(address => bytes32) private userToCodedWord;
     //mapping that maps users time of play
@@ -53,34 +53,44 @@ contract GameContract is EncryptionContract {
         emit GameStarted(msg.sender, block.timestamp, _codedWord);
     }
 
-    function playedGame(
-        bytes32 _encryptedWord,
-        string memory _word
-    ) public returns (bool) {
-        if (block.timestamp == 0) {
-            revert Error__NotPlayed();
-        }
-        if (block.timestamp >= timeOfPlay[msg.sender] + 1 days) {
+    
+ function playedGame(bytes32 _encryptedWord, string memory _word) public returns (bool) {
+     if (timeOfPlay[msg.sender] == 0) {
+         revert Error__NotPlayed();
+        }   
+
+     if (block.timestamp >= timeOfPlay[msg.sender] + 1 days) {
             revert Error__AlreadyPlayed();
         }
-        uint userStake = s_stakingContract.getStaked(msg.sender);
-        uint _payAmount = (REWARD_PERCENTAGE * userStake) / 100;
-        s_stakingToken.transfer(msg.sender, _payAmount);
+     // Check if the provided _word is not empty
+    require(bytes(_word).length > 0, "Input word cannot be empty");
 
-        bool isWon = isCorrect(_encryptedWord, _word);
-        //check if won
-        if (isWon) {
-            winners.push(msg.sender);
-            s_stakingToken.transfer(msg.sender, REWARD_AMOUNT);
-        }
-        emit PlayedGame(msg.sender, isWon, _payAmount + REWARD_AMOUNT);
+    // Calculate rewards
+    uint userStake = s_stakingContract.getStaked(msg.sender);
+    uint _payAmount = (REWARD_PERCENTAGE * userStake) / 100;
+
+    // Update the user's balance before any transfers
+    uint initialBalance = s_stakingToken.balanceOf(address(this));
+
+    // Transfer the reward for playing
+    s_stakingToken.transfer(msg.sender, _payAmount);
+
+    bool isWon = isCorrect(_encryptedWord, _word);
+
+    // Check if won
+    if (isWon) {
+        isWinner[msg.sender] = true; // Mark the player as a winner
     }
 
-    function fetchWinners() public view returns (address[] memory) {
-        return winners;
+    // Calculate and transfer additional rewards
+    uint finalBalance = s_stakingToken.balanceOf(address(this));
+    uint additionalReward = finalBalance - initialBalance;
+
+    if (isWon && additionalReward > 0) {
+        s_stakingToken.transfer(msg.sender, additionalReward);
     }
 
-    function fetchPlayerInfo() public view returns (bytes32, uint256) {
-        return (userToCodedWord[msg.sender], timeOfPlay[msg.sender]);
-    }
+    emit PlayedGame(msg.sender, isWon, _payAmount + additionalReward);
+
+    return isWon;
 }
